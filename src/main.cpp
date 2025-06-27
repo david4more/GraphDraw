@@ -1,21 +1,18 @@
-#include <SFML/Graphics.hpp>
+#include "GraphDraw.h"
 
 int main()
 {
-    auto window = sf::RenderWindow(sf::VideoMode({1920u, 1080u}), "CMake SFML Project");
-    window.setFramerateLimit(144);
+    RenderWindow window(VideoMode({ 800, 600 }), "GraphDraw", Style::Default);
+    window.setFramerateLimit(240);
+
+    GraphDraw app(window);
 
     while (window.isOpen())
     {
-        while (const std::optional event = window.pollEvent())
-        {
-            if (event->is<sf::Event::Closed>())
-            {
-                window.close();
-            }
-        }
-
-        window.clear();
-        window.display();
+        app.pollEvents();
+        app.update();
+        app.render();
     }
+
+    return 0;
 }
