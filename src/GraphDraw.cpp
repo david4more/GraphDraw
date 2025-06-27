@@ -88,9 +88,11 @@ GraphDraw::GraphDraw(RenderWindow& wnd)
 	editButton.setSize(editButtonSize);
 	editButton.setTexture(&editButtonTexture);
 	editButton.setPosition(viewRect.position + editButtonPos);
+
+	if (!font.openFromFile("../../../../files/font.ttf")) cerr << "Unable to load font.\n";
 }
 
-void GraphDraw::pollEvents()
+void GraphDraw::update()
 {
 	window.handleEvents(
 		[this](const Event::Closed& e) { 
@@ -117,6 +119,9 @@ void GraphDraw::render()
 	for (const VertexArray& array : tableLines)
 		window.draw(array);
 
+	for (const VertexArray& line : grid)
+		window.draw(line);
+
 	window.draw(editButton);
 
 	window.display();
@@ -127,10 +132,10 @@ void GraphDraw::loop()
 	switch (state)
 	{
 	case appState::draw:
-		pollEvents();
+		update();
 		break;
 	case appState::edit:
-		window.handleEvents( 
+		window.handleEvents(
 			[this](const Event::MouseButtonReleased& e) { editOnMouseButtonReleased(e); }, 
 			[this](const Event::MouseMoved& e) { editOnMouseMoved(e); });
 		break;
@@ -147,7 +152,6 @@ void GraphDraw::updateView()
 void GraphDraw::updateUI()
 {
 	auto initAxis = [&](RectangleShape& axis, const Vector2f& size, const Vector2f& pos) {
-		axis.setFillColor(sf::Color::Black);
 		axis.setOrigin({ axesThickness / 2, axesThickness / 2 });
 		axis.setSize(size);
 		axis.setPosition(pos);
@@ -157,6 +161,75 @@ void GraphDraw::updateUI()
 	
 	editButton.setSize(editButtonSize);
 	editButton.setPosition(viewRect.position + editButtonPos);
+
+	updateGrid();
+}
+
+void GraphDraw::updateGrid()
+{
+	grid.clear();
+	numbers.clear();
+
+	float rawStepX = viewRect.size.x / idealLines;
+	float rawStepY = viewRect.size.y / idealLines;
+
+	auto niceStep = [](float rawStep) {
+		float power = std::floor(std::log10(rawStep));
+		float base = std::pow(10.f, power);
+		float fraction = rawStep / base;
+
+		if (fraction < 2.f)      return 1.f * base;
+		else if (fraction < 5.f) return 2.f * base;
+		else                    return 5.f * base;
+		};
+
+	// Use the smaller nice step for both axes to ensure squares
+	float step = std::min(niceStep(rawStepX), niceStep(rawStepY));
+
+	float startX = std::floor(viewRect.position.x / step) * step;
+	float endX = viewRect.position.x + viewRect.size.x;
+
+	float startY = std::floor(viewRect.position.y / step) * step;
+	float endY = viewRect.position.y + viewRect.size.y;
+
+	// Offset for text to avoid overlap with axes
+	const float textOffset = 5.0f * step / idealLines;
+
+	// Vertical grid lines and X numbers
+	for (float x = startX; x < endX; x += step)
+	{
+		VertexArray line(PrimitiveType::LineStrip, 2);
+		line[0].position = { x, viewRect.position.y };
+		line[1].position = { x, viewRect.position.y + viewRect.size.y };
+		line[0].color = line[1].color = Color(200, 200, 200, 150);
+
+		grid.push_back(line);
+
+		Number n;
+		n.position = { x + textOffset, 0 }; // offset from axes
+		std::ostringstream oss;
+		oss << std::fixed << std::setprecision(0) << x;
+		n.value = oss.str();
+		numbers.push_back(n);
+	}
+
+	// Horizontal grid lines and Y numbers
+	for (float y = startY; y < endY; y += step)
+	{
+		VertexArray line(PrimitiveType::LineStrip, 2);
+		line[0].position = { viewRect.position.x, y };
+		line[1].position = { viewRect.position.x + viewRect.size.x, y };
+		line[0].color = line[1].color = Color(200, 200, 200, 150);
+
+		grid.push_back(line);
+
+		Number n;
+		n.position = { 0, y + textOffset }; // offset from axes
+		std::ostringstream oss;
+		oss << std::fixed << std::setprecision(0) << y;
+		n.value = oss.str();
+		numbers.push_back(n);
+	}
 }
 
 void GraphDraw::updateGraphs()
@@ -196,6 +269,7 @@ void GraphDraw::onMouseWheelScrolled(const Event::MouseWheelScrolled& event)
 	pointOffset *= zoomFactor;
 	editButtonSize *= zoomFactor;
 	editButtonPos *= zoomFactor;
+	fontSize *= zoomFactor;
 
 	updateView();
 	updateUI();

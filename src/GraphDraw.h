@@ -14,15 +14,26 @@ public:
 	void loop();
 
 private:
-	void pollEvents();
 	void update();
 	void render();
 	enum appState { draw, edit } state;
-
 	RenderWindow& window;
+
+	struct Number
+	{
+		Vector2f position;
+		string value;
+	};
 	RectangleShape xAxis, yAxis;
+	vector<VertexArray> grid;
+	vector<Number> numbers;
+	float idealLines = 10.f;
+	float fontSize = 1.f;
+	Font font;
+
 	float axesThickness = 2.f;
 	void updateUI();
+	void updateGrid();
 
 	bool lmbHeld = false;		// left mouse button
 	Vector2i mousePos, initMousePos;
@@ -31,7 +42,7 @@ private:
 	FloatRect viewRect;
 	void updateView();
 
-	float pointOffset = 0.5f;
+	float pointOffset = 1.f;
 	ifstream file;
 	struct Graph
 	{
