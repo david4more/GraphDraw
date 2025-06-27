@@ -17,7 +17,7 @@ public:
 private:
 	RenderWindow& window;
 	RectangleShape xAxis, yAxis;
-	const float axesThickness = 2.f;
+	float axesThickness = 2.f;
 	void updateAxis();
 
 	bool lmbHeld = false;		// left mouse button
@@ -36,12 +36,15 @@ private:
 		Graph(string str, Color color) : color(color) {
 			parser.DefineVar("x", &x);
 			parser.SetExpr(str);
+			line.setPrimitiveType(PrimitiveType::LineStrip);
 		}
 
 		mu::Parser parser;
 		Color color;
 		VertexArray line;
 	};
+
+	const Color defaultColor = Color::Red;
 	vector<Graph> graphs;
 	void updateGraphs();
 
@@ -49,4 +52,5 @@ private:
 	void onKeyPressed(const Event::KeyPressed& event);
 	void onMouseButtonPressed(const Event::MouseButtonPressed& event);
 	void onMouseButtonReleased(const Event::MouseButtonReleased& event);
+	void onMouseWheelScrolled(const Event::MouseWheelScrolled& event);
 };
