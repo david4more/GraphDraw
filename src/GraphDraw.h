@@ -19,17 +19,12 @@ private:
 	enum appState { draw, edit } state;
 	RenderWindow& window;
 
-	struct Number
-	{
-		Vector2f position;
-		string value;
-	};
 	RectangleShape xAxis, yAxis;
 	vector<VertexArray> grid;
-	vector<Number> numbers;
 	float idealLines = 10.f;
-	float fontSize = 1.f;
-	Font font;
+	//vector<Number> numbers;
+	//float fontSize = 1.f;
+	//Font font;
 
 	float axesThickness = 2.f;
 	void updateUI();

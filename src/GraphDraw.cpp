@@ -88,8 +88,6 @@ GraphDraw::GraphDraw(RenderWindow& wnd)
 	editButton.setSize(editButtonSize);
 	editButton.setTexture(&editButtonTexture);
 	editButton.setPosition(viewRect.position + editButtonPos);
-
-	if (!font.openFromFile("../../../../files/font.ttf")) cerr << "Unable to load font.\n";
 }
 
 void GraphDraw::update()
@@ -168,7 +166,6 @@ void GraphDraw::updateUI()
 void GraphDraw::updateGrid()
 {
 	grid.clear();
-	numbers.clear();
 
 	float rawStepX = viewRect.size.x / idealLines;
 	float rawStepY = viewRect.size.y / idealLines;
@@ -204,13 +201,6 @@ void GraphDraw::updateGrid()
 		line[0].color = line[1].color = Color(200, 200, 200, 150);
 
 		grid.push_back(line);
-
-		Number n;
-		n.position = { x + textOffset, 0 }; // offset from axes
-		std::ostringstream oss;
-		oss << std::fixed << std::setprecision(0) << x;
-		n.value = oss.str();
-		numbers.push_back(n);
 	}
 
 	// Horizontal grid lines and Y numbers
@@ -222,13 +212,6 @@ void GraphDraw::updateGrid()
 		line[0].color = line[1].color = Color(200, 200, 200, 150);
 
 		grid.push_back(line);
-
-		Number n;
-		n.position = { 0, y + textOffset }; // offset from axes
-		std::ostringstream oss;
-		oss << std::fixed << std::setprecision(0) << y;
-		n.value = oss.str();
-		numbers.push_back(n);
 	}
 }
 
@@ -269,7 +252,6 @@ void GraphDraw::onMouseWheelScrolled(const Event::MouseWheelScrolled& event)
 	pointOffset *= zoomFactor;
 	editButtonSize *= zoomFactor;
 	editButtonPos *= zoomFactor;
-	fontSize *= zoomFactor;
 
 	updateView();
 	updateUI();
