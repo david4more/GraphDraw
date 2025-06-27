@@ -1,5 +1,4 @@
 #pragma once
-
 #include <iostream>
 #include <fstream>
 #include <SFML/Graphics.hpp>
@@ -30,15 +29,16 @@ private:
 
 	float pointOffset = 0.5f;
 	ifstream file;
-	static float x;
 	struct Graph
 	{
-		Graph(string str, Color color) : color(color) {
+		static double x;
 
-			expression.SetExpr(str);
+		Graph(string str, Color color) : color(color) {
+			parser.DefineVar("x", &x);
+			parser.SetExpr(str);
 		}
 
-		mu::Parser expression;
+		mu::Parser parser;
 		Color color;
 		VertexArray line;
 	};

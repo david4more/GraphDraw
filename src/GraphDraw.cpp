@@ -1,6 +1,6 @@
 #include "GraphDraw.h"
 
-float GraphDraw::x = 0.f;
+double GraphDraw::Graph::x = 0.f;
 
 GraphDraw::GraphDraw(RenderWindow& wnd)
 	: window(wnd)
@@ -18,11 +18,9 @@ GraphDraw::GraphDraw(RenderWindow& wnd)
 	initAxis(yAxis, { axesThickness, viewRect.size.y });
 	updateAxis();
 
-	//if (!(file = ifstream("graphs.txt")))
-		//std::cerr << "Unable to open the file.\n";
+	if (!(file = ifstream("../../../../graphs.txt")))
+		std::cerr << "Unable to open the file.\n";
 
-
-	graphs.push_back(Graph("3 + 2 * 4", Color::Green));
 	string str;
 	while (getline(file, str))
 	{
@@ -89,16 +87,16 @@ void GraphDraw::updateGraphs()
 	{
 		graph.line.clear();
 
-		x = viewRect.position.x;
+		Graph::x = viewRect.position.x;
 
 		for (int i = 0; i <= steps; i++)
 		{
 			Vertex v;
-			v.position = Vector2f(x, -graph.expression.Eval()); // Update to use Eval
+			v.position = Vector2f(Graph::x, -graph.parser.Eval()); // Update to use Eval
 			v.color = graph.color;
 			graph.line.append(v);
 
-			x += pointOffset;
+			Graph::x += pointOffset;
 		}
 	}
 }
