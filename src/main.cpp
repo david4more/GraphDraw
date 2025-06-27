@@ -8,11 +8,7 @@ int main()
     GraphDraw app(window);
 
     while (window.isOpen())
-    {
-        app.pollEvents();
-        app.update();
-        app.render();
-    }
+        app.loop();
 
     return 0;
 }

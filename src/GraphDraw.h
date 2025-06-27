@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include <SFML/Graphics.hpp>
 #include <muParser.h>
 using namespace sf;
@@ -10,15 +11,18 @@ class GraphDraw
 {
 public:
 	GraphDraw(RenderWindow& wnd);
+	void loop();
+
+private:
 	void pollEvents();
 	void update();
 	void render();
+	enum appState { draw, edit } state;
 
-private:
 	RenderWindow& window;
 	RectangleShape xAxis, yAxis;
 	float axesThickness = 2.f;
-	void updateAxis();
+	void updateUI();
 
 	bool lmbHeld = false;		// left mouse button
 	Vector2i mousePos, initMousePos;
@@ -44,13 +48,22 @@ private:
 		VertexArray line;
 	};
 
-	const Color defaultColor = Color::Red;
 	vector<Graph> graphs;
 	void updateGraphs();
+	Color defaultColor = Color::Black;
+
+	Texture editButtonTexture, doneButtonTexture;
+	RectangleShape editButton;
+	Vector2f editButtonSize = { 200.f, 200.f };
+	Vector2f editButtonPos;
+	vector<VertexArray> tableLines;
+
+	ofstream fileWrite;
+	void editOnMouseButtonReleased(const Event::MouseButtonReleased& event);
+	void editOnMouseMoved(const Event::MouseMoved& event);
 
 	// event callbacks
-	void onKeyPressed(const Event::KeyPressed& event);
-	void onMouseButtonPressed(const Event::MouseButtonPressed& event);
 	void onMouseButtonReleased(const Event::MouseButtonReleased& event);
 	void onMouseWheelScrolled(const Event::MouseWheelScrolled& event);
+	void onMouseMoved(const Event::MouseMoved& event);
 };
