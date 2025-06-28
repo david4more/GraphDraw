@@ -41,6 +41,10 @@ GraphDraw::GraphDraw(RenderWindow& wnd)
 	{
 		if (str.empty())
 			continue;
+		if (str[0] == '/')
+			continue;
+		if (str[0] == '#')
+			break;
 
 		auto pos = str.find('c');	// color
 		if (str[0] == 't')	// table-type graph
@@ -113,17 +117,13 @@ void GraphDraw::render()
 
 	window.draw(xAxis);
 	window.draw(yAxis);
-	for (const Graph& graph : graphs)
-		window.draw(graph.line);
+	for (const Graph& graph : graphs) window.draw(graph.line);
 
-	for (const VertexArray& array : tableLines)
-		window.draw(array);
+	for (const VertexArray& array : tableLines) window.draw(array);
 
-	for (const VertexArray& line : grid)
-		window.draw(line);
+	for (const VertexArray& line : grid) window.draw(line);
 
-	for (const Text& number : numbers)
-		window.draw(number);
+	//for (const Text& number : numbers) window.draw(number);
 
 	window.draw(editButton);
 
