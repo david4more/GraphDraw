@@ -123,7 +123,7 @@ void GraphDraw::render()
 
 	for (const VertexArray& line : grid) window.draw(line);
 
-	//for (const Text& number : numbers) window.draw(number);
+	for (const Text& number : numbers) window.draw(number);
 
 	window.draw(editButton);
 
@@ -208,9 +208,10 @@ void GraphDraw::updateGrid()
 
 		grid.push_back(line);
 
-		numbers.push_back(Text(font, to_string(static_cast<int>(x)), fontSize));
+		numbers.push_back(Text(font, to_string(static_cast<int>(x)), defFontSize));
+		numbers.back().setScale({ fontSize, fontSize });
 		numbers.back().setFillColor(Color::Black);
-		numbers.back().setPosition({ round(x), 0 });
+		numbers.back().setPosition({ x, 0 });
 	}
 
 	// Horizontal grid lines and Y numbers
@@ -223,10 +224,10 @@ void GraphDraw::updateGrid()
 
 		grid.push_back(line);
 
-
-		numbers.push_back(Text(font, to_string(static_cast<int>(-y)), fontSize));
+		numbers.push_back(Text(font, to_string(static_cast<int>(-y)), defFontSize));
+		numbers.back().setScale({ fontSize, fontSize });
 		numbers.back().setFillColor(Color::Black);
-		numbers.back().setPosition({ 0, round(y) });
+		numbers.back().setPosition({ 0, y });
 	}
 }
 
@@ -272,6 +273,7 @@ void GraphDraw::onMouseWheelScrolled(const Event::MouseWheelScrolled& event)
 	updateView();
 	updateUI();
 	updateGraphs();
+	cerr << fontSize << '\n';
 }
 
 void GraphDraw::onMouseMoved(const Event::MouseMoved& event)
