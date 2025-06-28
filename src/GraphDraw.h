@@ -22,9 +22,9 @@ private:
 	RectangleShape xAxis, yAxis;
 	vector<VertexArray> grid;
 	float idealLines = 10.f;
-	//vector<Number> numbers;
-	//float fontSize = 1.f;
-	//Font font;
+	vector<Text> numbers;
+	float fontSize = 1.f;
+	Font font;
 
 	float axesThickness = 2.f;
 	void updateUI();

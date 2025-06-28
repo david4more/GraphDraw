@@ -20,7 +20,7 @@ GraphDraw::GraphDraw(RenderWindow& wnd)
 	yAxis.setFillColor(Color::Black);
 	updateUI();
 
-	if (!(file = ifstream("../../../../files/file.graph"))) 
+	if (!(file = ifstream("../../../../files/file.graph")))
 		std::cerr << "Unable to open the file.\n";
 	else
 		fileWrite = ofstream("../../../../files/file.graph", ios::app);
@@ -88,21 +88,23 @@ GraphDraw::GraphDraw(RenderWindow& wnd)
 	editButton.setSize(editButtonSize);
 	editButton.setTexture(&editButtonTexture);
 	editButton.setPosition(viewRect.position + editButtonPos);
+
+	if (!font.openFromFile("../../../../files/font.ttf")) cerr << "Unable to load font.\n";
 }
 
 void GraphDraw::update()
 {
 	window.handleEvents(
-		[this](const Event::Closed& e) { 
+		[this](const Event::Closed& e) {
 			window.close(); },
-		[this](const Event::KeyPressed& e) { 
+			[this](const Event::KeyPressed& e) {
 			if (e.scancode == Keyboard::Scancode::Escape) window.close(); },
-		[this](const Event::MouseButtonPressed& e) { 
+			[this](const Event::MouseButtonPressed& e) {
 			lmbHeld = true; initMousePos = Mouse::getPosition(window); },
-		[this](const Event::MouseButtonReleased& e) { onMouseButtonReleased(e); },
-		[this](const Event::MouseWheelScrolled& e) { onMouseWheelScrolled(e); },
-		[this](const Event::MouseMoved& e) { onMouseMoved(e); }
-	);
+			[this](const Event::MouseButtonReleased& e) { onMouseButtonReleased(e); },
+			[this](const Event::MouseWheelScrolled& e) { onMouseWheelScrolled(e); },
+			[this](const Event::MouseMoved& e) { onMouseMoved(e); }
+			);
 }
 
 void GraphDraw::render()
@@ -120,6 +122,9 @@ void GraphDraw::render()
 	for (const VertexArray& line : grid)
 		window.draw(line);
 
+	for (const Text& number : numbers)
+		window.draw(number);
+
 	window.draw(editButton);
 
 	window.display();
@@ -134,7 +139,7 @@ void GraphDraw::loop()
 		break;
 	case appState::edit:
 		window.handleEvents(
-			[this](const Event::MouseButtonReleased& e) { editOnMouseButtonReleased(e); }, 
+			[this](const Event::MouseButtonReleased& e) { editOnMouseButtonReleased(e); },
 			[this](const Event::MouseMoved& e) { editOnMouseMoved(e); });
 		break;
 	}
@@ -156,7 +161,7 @@ void GraphDraw::updateUI()
 		};
 	initAxis(xAxis, { viewRect.size.x, axesThickness }, { viewRect.position.x, 0.f });
 	initAxis(yAxis, { axesThickness, viewRect.size.y }, { 0.f, viewRect.position.y });
-	
+
 	editButton.setSize(editButtonSize);
 	editButton.setPosition(viewRect.position + editButtonPos);
 
@@ -166,6 +171,7 @@ void GraphDraw::updateUI()
 void GraphDraw::updateGrid()
 {
 	grid.clear();
+	numbers.clear();
 
 	float rawStepX = viewRect.size.x / idealLines;
 	float rawStepY = viewRect.size.y / idealLines;
@@ -201,6 +207,10 @@ void GraphDraw::updateGrid()
 		line[0].color = line[1].color = Color(200, 200, 200, 150);
 
 		grid.push_back(line);
+
+		numbers.push_back(Text(font, to_string(static_cast<int>(x)), fontSize));
+		numbers.back().setFillColor(Color::Black);
+		numbers.back().setPosition({ round(x), 0 });
 	}
 
 	// Horizontal grid lines and Y numbers
@@ -212,6 +222,11 @@ void GraphDraw::updateGrid()
 		line[0].color = line[1].color = Color(200, 200, 200, 150);
 
 		grid.push_back(line);
+
+
+		numbers.push_back(Text(font, to_string(static_cast<int>(-y)), fontSize));
+		numbers.back().setFillColor(Color::Black);
+		numbers.back().setPosition({ 0, round(y) });
 	}
 }
 
@@ -252,6 +267,7 @@ void GraphDraw::onMouseWheelScrolled(const Event::MouseWheelScrolled& event)
 	pointOffset *= zoomFactor;
 	editButtonSize *= zoomFactor;
 	editButtonPos *= zoomFactor;
+	fontSize *= zoomFactor;
 
 	updateView();
 	updateUI();
@@ -275,7 +291,7 @@ void GraphDraw::onMouseMoved(const Event::MouseMoved& event)
 
 void GraphDraw::onMouseButtonReleased(const Event::MouseButtonReleased& event)
 {
-	lmbHeld = false; initMousePos = { 0,0 }; 
+	lmbHeld = false; initMousePos = { 0,0 };
 
 	if (!editButton.getGlobalBounds().contains(static_cast<sf::Vector2f>(window.mapPixelToCoords(event.position))))
 		return;
