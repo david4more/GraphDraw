@@ -23,7 +23,7 @@ private:
 	vector<VertexArray> grid;
 	float idealLines = 10.f;
 	vector<Text> numbers;
-	float fontSize = 1.f;
+	float fontSize = 0.5f;
 	Font font;
 
 	float axesThickness = 2.f;
